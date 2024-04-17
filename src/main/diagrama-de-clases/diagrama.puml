@@ -1,3 +1,79 @@
 @startuml Diagrama Cuidandonos
 
+    class Transeunte{
+        -nombreCompleto : String
+        -direccion : String
+        -edad : Integer
+        -sexo : Sexo
+        -ubicacionActual : Ubicacion
+        -trayectoAsociado : Trayecto
+        -numeroDeTelefono : String
+        -alertaConfigurada : Alerta
+
+        +apretarBotonEmpezarViaje() : void
+        +apretarBotonLlegarBien() : void
+        +quieroViajar(Ubicacion, Ubicacion, List<Cuidador>) : void
+        +comenzarViaje(List<Cuidador>) : void
+        +ejecutarAlerta() : void
+    }
+
+    enum Sexo{
+        FEMENINO,
+        MASCULINO,
+        OTRO
+    }
+
+    class Ubicacion{
+        -latitud : String
+        -longitud : String
+    }
+
+    class Cuidador{
+        +recibirNotificacion(String) : void
+        +quiereHacerTrayecto() : boolean
+    }
+
+    class Trayecto{
+        -transeunte : Transeunte
+        -cuidadores : List<Cuidador>
+        -inicio : Ubicacion
+        -destino : Ubicacion
+        -estaComenzado : boolean
+        -llegoBien : boolean
+
+        +calcularDemora() : float
+        +pasoMasTiempoDelEsperado() : boolean
+    }
+
+    interface Alerta{
+        +alertar() : void
+    }
+
+    class AlertaACuidadores{
+        +alertar() : void
+    }
+
+    class AlertaAPolicia{
+        +alertar() : void
+    }
+
+    class Esperar{
+        +alertar() : void
+    }
+
+    class LlamarACelular{
+        +alertar() : void
+    }
+
+Transeunte --> Sexo
+Trayecto --* Transeunte
+Trayecto -->"*" Cuidador
+Transeunte --> Ubicacion
+Trayecto -->"*" Ubicacion
+Transeunte ..> Alerta
+AlertaACuidadores ..|> Alerta
+AlertaAPolicia ..|> Alerta
+Esperar ..|> Alerta
+LlamarACelular ..|> Alerta
+
 @enduml

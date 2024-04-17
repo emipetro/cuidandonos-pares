@@ -63,7 +63,7 @@ public class Transeunte {
     }
 
     //Cuando el transeunte apriete el botón, comienza el viaje
-    private void comenzarViaje(List<Cuidador> cuidadores){
+    public void comenzarViaje(List<Cuidador> cuidadores){
         Float demoraAproximada = this.trayectoAsociado.calcularDemora();
         for(Cuidador unCuidador : cuidadores){
             unCuidador.recibirNotificacion("La demora aproximada es de "+demoraAproximada+" minutos");
@@ -90,7 +90,7 @@ public class Transeunte {
         }
     }
 
-    private void ejecutarAlerta() {
+    public void ejecutarAlerta() {
         this.alertaConfigurada.alertar();
     }
 

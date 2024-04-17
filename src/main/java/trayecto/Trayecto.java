@@ -24,7 +24,7 @@ public class Trayecto {
         this.destino = destino;
     }
 
-    public Float calcularDemora(){
+    public float calcularDemora(){
         //TODO
         //Calcular distancia en metros entre inicio y destino
 
