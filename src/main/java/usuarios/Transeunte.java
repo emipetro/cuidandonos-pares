@@ -16,26 +16,25 @@ public class Transeunte {
     @Setter @Getter private String direccion;
     @Setter @Getter private Integer edad;
     @Setter @Getter private Sexo sexo;
-    @Setter @Getter private Ubicacion ubicacionActual;
     @Setter @Getter private Trayecto trayectoAsociado = null;
     @Setter @Getter private String numeroDeTelefono;
 
     @Setter @Getter private Alerta alertaConfigurada;
 
-    public Transeunte(String nombreCompleto, String direccion, Integer edad, Sexo sexo, Ubicacion ubicacionActual, String numeroDeTelefono, Alerta alertaConfigurada) {
+    public Transeunte(String nombreCompleto, String direccion, Integer edad, Sexo sexo, String numeroDeTelefono, Alerta alertaConfigurada) {
         this.nombreCompleto = nombreCompleto;
         this.direccion = direccion;
         this.sexo = sexo;
         this.edad = edad;
         this.numeroDeTelefono = numeroDeTelefono;
         this.alertaConfigurada = alertaConfigurada;
-        this.ubicacionActual = ubicacionActual;
     }
 
     ////////// BOTONES /////////
 
-    public void apretarBotonComenzarViaje(List<Cuidador> cuidadoresConfirmados) {
+    public void apretarBotonComenzarViaje() {
         float demoraAproximada = this.trayectoAsociado.calcularDemora();
+        List<Cuidador> cuidadoresConfirmados = this.trayectoAsociado.getCuidadores();
         for(Cuidador unCuidador : cuidadoresConfirmados){
             unCuidador.recibirNotificacion("La demora aproximada es de "+demoraAproximada+" minutos");
         }
@@ -98,6 +97,6 @@ public class Transeunte {
     }
 
     public void ejecutarAlerta() {
-        this.alertaConfigurada.alertar();
+        this.alertaConfigurada.alertar(this);
     }
 }

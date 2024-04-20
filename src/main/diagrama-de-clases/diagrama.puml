@@ -5,15 +5,14 @@
         -direccion : String
         -edad : Integer
         -sexo : Sexo
-        -ubicacionActual : Ubicacion
         -trayectoAsociado : Trayecto
         -numeroDeTelefono : String
         -alertaConfigurada : Alerta
 
-        +apretarBotonEmpezarViaje() : void
+        +apretarBotonComenzarViaje() : void
         +apretarBotonLlegarBien() : void
         +quieroViajar(Ubicacion, Ubicacion, List<Cuidador>) : void
-        +comenzarViaje(List<Cuidador>) : void
+        +comenzarViaje() : void
         +ejecutarAlerta() : void
     }
 
@@ -29,6 +28,8 @@
     }
 
     class Cuidador{
+        -trayectoAsociado : Trayecto
+
         +recibirNotificacion(String) : void
         +quiereHacerTrayecto() : boolean
     }
@@ -38,31 +39,33 @@
         -cuidadores : List<Cuidador>
         -inicio : Ubicacion
         -destino : Ubicacion
-        -estaComenzado : boolean
-        -llegoBien : boolean
 
         +calcularDemora() : float
-        +pasoMasTiempoDelEsperado() : boolean
     }
 
+    class Comenzado{}
+    class FinalizadoCorrectamente{}
+    class Solicitado{}
+
+
     interface Alerta{
-        +alertar() : void
+        +alertar(Transeunte) : void
     }
 
     class AlertaACuidadores{
-        +alertar() : void
+        +alertar(Transeunte) : void
     }
 
     class AlertaAPolicia{
-        +alertar() : void
+        +alertar(Transeunte) : void
     }
 
     class Esperar{
-        +alertar() : void
+        +alertar(Transeunte) : void
     }
 
     class LlamarACelular{
-        +alertar() : void
+        +alertar(Transeunte) : void
     }
 
 Transeunte --> Sexo
@@ -75,5 +78,8 @@ AlertaACuidadores ..|> Alerta
 AlertaAPolicia ..|> Alerta
 Esperar ..|> Alerta
 LlamarACelular ..|> Alerta
+Comenzado --|> Trayecto
+FinalizadoCorrectamente --|> Trayecto
+Solicitado --|> Trayecto
 
 @enduml
