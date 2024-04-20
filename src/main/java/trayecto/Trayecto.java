@@ -7,15 +7,12 @@ import usuarios.Cuidador;
 import usuarios.Transeunte;
 import java.util.List;
 
-public class Trayecto {
-    @Setter @Getter private Transeunte transeunte;
-    @Setter @Getter private List<Cuidador> cuidadores;
+public abstract class Trayecto {
+    @Setter @Getter protected Transeunte transeunte;
+    @Setter @Getter protected List<Cuidador> cuidadores;
 
-    @Setter @Getter private Ubicacion inicio;
-    @Setter @Getter private Ubicacion destino;
-
-    @Setter @Getter private boolean estaComenzado = false;
-    @Setter @Getter private boolean llegoBien = false;
+    @Setter @Getter protected Ubicacion inicio;
+    @Setter @Getter protected Ubicacion destino;
 
     public Trayecto(Transeunte transeunte, List<Cuidador> cuidadores, Ubicacion inicio, Ubicacion destino) {
         this.transeunte = transeunte;
@@ -23,20 +20,11 @@ public class Trayecto {
         this.inicio = inicio;
         this.destino = destino;
     }
-
     public float calcularDemora(){
-        //TODO
         //Calcular distancia en metros entre inicio y destino
 
-        //TODO
         //Calcular tiempo de demora aproximado entre inicio y destino
         return (float) 0;
-    }
-
-    public boolean pasoMasTiempoDelEsperado(){
-        //TODO
-        //Calcular si desde que inicio el trayecto hasta ahora pasó más tiempo de la demora esperada
-        return false;
     }
 
 }

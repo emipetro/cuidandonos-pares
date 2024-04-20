@@ -1,12 +1,16 @@
 package usuarios;
 
+import lombok.Getter;
+import lombok.Setter;
+import trayecto.Trayecto;
+
 public class Cuidador {
-    //TODO
+    @Getter @Setter private Trayecto trayectoAsociado = null;
+
     public void recibirNotificacion(String notificacion){
         //RECIBIR NOTIFICACION
     }
 
-    //TODO
     public boolean quiereHacerTrayecto(){
         // Tomar decision
         return true;

@@ -1,5 +1,8 @@
 package usuarios;
 import alertas.Alerta;
+import trayecto.Comenzado;
+import trayecto.FinalizadoCorrectamente;
+import trayecto.Solicitado;
 import trayecto.Trayecto;
 import extras.Sexo;
 import extras.Ubicacion;
@@ -26,66 +29,70 @@ public class Transeunte {
         this.edad = edad;
         this.numeroDeTelefono = numeroDeTelefono;
         this.alertaConfigurada = alertaConfigurada;
-
-        //TODO
-        this.ubicacionActual = ubicacionActual; // TRABAJAR SOBRE CÓMO INTERACTUAR CON LAS UBICACIONES (LONGITUD Y LATITUD)
+        this.ubicacionActual = ubicacionActual;
     }
 
     ////////// BOTONES /////////
-    // Pueden ser clases?
 
-    public void apretarBotonEmpezarViaje(){
-        this.trayectoAsociado.setEstaComenzado(true);
+    public void apretarBotonComenzarViaje(List<Cuidador> cuidadoresConfirmados) {
+        float demoraAproximada = this.trayectoAsociado.calcularDemora();
+        for(Cuidador unCuidador : cuidadoresConfirmados){
+            unCuidador.recibirNotificacion("La demora aproximada es de "+demoraAproximada+" minutos");
+        }
     }
 
     public void apretarBotonLlegueBien(){
-        this.trayectoAsociado.setLlegoBien(true);
+        List<Cuidador> cuidadores = trayectoAsociado.getCuidadores();
+        Ubicacion inicio = trayectoAsociado.getInicio();
+        Ubicacion destino = trayectoAsociado.getDestino();
+
+        //Seteo como nuevo trayecto asociado un trayecto FinalizadoCorrectamente pero con los campos del trayecto que en su momento fue Comenzado
+        setTrayectoAsociado(new FinalizadoCorrectamente(this,cuidadores,inicio,destino));
+
+        //////////////////////////////////////////////
+        // Habilitar notificaciones para el transeunte
+        //////////////////////////////////////////////
+
+        for(Cuidador unCuidador : cuidadores){
+            unCuidador.recibirNotificacion("El viaje ha finalizado correctamente");
+        }
     }
 
     ////////////////////////////
-    public void quieroViajar(Ubicacion inicio, Ubicacion destino, List<Cuidador> cuidadores){
-        Transeunte transeunte = new Transeunte(this.nombreCompleto,this.direccion,this.edad,this.sexo,inicio,this.numeroDeTelefono,this.alertaConfigurada);
-        Trayecto nuevoTrayecto = new Trayecto(transeunte,cuidadores,inicio,destino);
-        this.trayectoAsociado = nuevoTrayecto;
+    public void quieroViajar(Ubicacion inicio, Ubicacion destino, List<Cuidador> cuidadoresDeseados){
+        this.setTrayectoAsociado(new Solicitado(this,inicio,destino));
 
-        for(Cuidador unCuidador : cuidadores){
+        for(Cuidador unCuidador : cuidadoresDeseados){
             unCuidador.recibirNotificacion("Te han seleccionado para un trayecto");
-            if(unCuidador.quiereHacerTrayecto()){
-               //TODO
-               //MOSTRAR BOTÓN PARA EMPEZAR VIAJE
+        }
 
-                //Dicho botón COMENZAR cambia el estado del trayecto a iniciado
-                if(nuevoTrayecto.isEstaComenzado()){
-                    this.comenzarViaje(cuidadores);
-                }
+        List<Cuidador> cuidadoresConfirmados = null;
+        for(Cuidador unCuidador : cuidadoresDeseados){
+            if(unCuidador.quiereHacerTrayecto()){
+                cuidadoresConfirmados.add(unCuidador);
             }
         }
+
+        if(cuidadoresConfirmados!=null){
+            //MOSTRAR BOTÓN COMENZAR VIAJE
+        }
+
+        this.setTrayectoAsociado(new Comenzado(this,cuidadoresConfirmados,inicio,destino));
+        this.comenzarViaje();
     }
 
     //Cuando el transeunte apriete el botón, comienza el viaje
-    public void comenzarViaje(List<Cuidador> cuidadores){
-        Float demoraAproximada = this.trayectoAsociado.calcularDemora();
-        for(Cuidador unCuidador : cuidadores){
-            unCuidador.recibirNotificacion("La demora aproximada es de "+demoraAproximada+" minutos");
-        }
+    public void comenzarViaje(){
+        float demoraAproximada = this.trayectoAsociado.calcularDemora();
 
         //Mientras no haya pasado el tiempo de la demora se bloquean las notificaciones
-        //Puede pensarse de otra manera que no sea un for
         for(int i=0;i<demoraAproximada;i++){
-            //TODO
             //Bloquear notificaciones
             //Mientras se ejecuta esto, el usuario puede presionar el botón de "Llegué bien!"
         }
 
-        if(trayectoAsociado.isLlegoBien()){
-            //TODO
-            //Habilitar notificaciones
-
-            for(Cuidador unCuidador : cuidadores){
-                unCuidador.recibirNotificacion("El viaje ha finalizado");
-            }
-        }
-        else{
+        //Si el trayecto no pasó a ser FinalizadoCorrectamente (debido al botón), se ejecuta la alarma
+        if(!(this.trayectoAsociado instanceof FinalizadoCorrectamente)){
             this.ejecutarAlerta();
         }
     }
@@ -93,5 +100,4 @@ public class Transeunte {
     public void ejecutarAlerta() {
         this.alertaConfigurada.alertar();
     }
-
 }
