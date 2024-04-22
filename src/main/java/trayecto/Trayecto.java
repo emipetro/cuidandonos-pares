@@ -1,7 +1,7 @@
 package trayecto;
 
-import extras.CalculadoraDistancia;
-import extras.DistanciaMatrixAPI;
+import extras.calculadora.CalculadoraDistancia;
+import extras.calculadora.DistanciaMatrixAPI;
 import extras.Ubicacion;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +23,6 @@ public abstract class Trayecto {
         this.cuidadores = cuidadores;
         this.inicio = inicio;
         this.destino = destino;
-
     }
     public float calcularDemora(){
         float distanciaTrayecto = this.calculadoraDistancia.calcularDistancia(inicio,destino);

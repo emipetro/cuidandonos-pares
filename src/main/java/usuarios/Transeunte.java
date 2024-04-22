@@ -1,5 +1,6 @@
 package usuarios;
 import alertas.Alerta;
+import extras.modos_de_viaje.ModoDeViaje;
 import trayecto.Comenzado;
 import trayecto.FinalizadoCorrectamente;
 import trayecto.Solicitado;
@@ -113,5 +114,11 @@ public class Transeunte {
 
     public void ejecutarAlerta() {
         this.alertaConfigurada.alertar(this);
+    }
+
+    /////////////IMPLEMENTACIÓN EXTENDIDA/////////////
+    public void quieroViajarExtendido(Ubicacion inicio, List<Ubicacion> destinos, List<Cuidador> cuidadoresDeseados, ModoDeViaje modoDeViaje){
+
+
     }
 }

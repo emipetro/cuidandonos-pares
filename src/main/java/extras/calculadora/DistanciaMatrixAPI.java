@@ -1,4 +1,6 @@
-package extras;
+package extras.calculadora;
+
+import extras.Ubicacion;
 
 public class DistanciaMatrixAPI implements CalculadoraDistancia{
     @Override
