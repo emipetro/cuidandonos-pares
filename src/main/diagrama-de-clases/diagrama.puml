@@ -8,6 +8,7 @@
         -trayectoAsociado : Trayecto
         -numeroDeTelefono : String
         -alertaConfigurada : Alerta
+        -trayectosRealizados : List<Trayecto>
 
         +apretarBotonComenzarViaje() : void
         +apretarBotonLlegarBien() : void
@@ -28,25 +29,46 @@
     }
 
     class Cuidador{
+        -nombreCompleto : String
+        -direccion : String
+        -edad : Integer
+        -sexo : Sexo
+        -numeroDeTelefono : String
         -trayectoAsociado : Trayecto
+        -trayectosRealizados : List<Trayecto>
 
         +recibirNotificacion(String) : void
-        +quiereHacerTrayecto() : boolean
+        +quiereHacerTrayecto(Trayecto) : boolean
     }
 
-    class Trayecto{
+    abstract class Trayecto{
         -transeunte : Transeunte
         -cuidadores : List<Cuidador>
         -inicio : Ubicacion
         -destino : Ubicacion
+        -calculadoraDistancia : CalculadoraDistancia
 
         +calcularDemora() : float
+        +cambiarEstado(Transeunte) : void
     }
 
-    class Comenzado{}
-    class FinalizadoCorrectamente{}
-    class Solicitado{}
+    class Comenzado{
+        +cambiarEstado(Transeunte) : void
+    }
+    class FinalizadoCorrectamente{
+        +cambiarEstado(Transeunte) : void
+    }
+    class Solicitado{
+        +cambiarEstado(Transeunte) : void
+    }
 
+    interface CalculadoraDistancia{
+        +calcularDistancia(Ubicacion, Ubicacion) : float
+    }
+
+    class DistanciaMatrixAPI{
+        +calcularDistancia(Ubicacion, Ubicacion) : float
+    }
 
     interface Alerta{
         +alertar(Transeunte) : void
@@ -81,5 +103,7 @@ LlamarACelular ..|> Alerta
 Comenzado --|> Trayecto
 FinalizadoCorrectamente --|> Trayecto
 Solicitado --|> Trayecto
+DistanciaMatrixAPI ..|> CalculadoraDistancia
+Trayecto ..> CalculadoraDistancia
 
 @enduml

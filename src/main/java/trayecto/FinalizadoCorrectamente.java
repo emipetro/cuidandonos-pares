@@ -10,4 +10,10 @@ public class FinalizadoCorrectamente extends Trayecto{
     public FinalizadoCorrectamente(Transeunte transeunte, List<Cuidador> cuidadores, Ubicacion inicio, Ubicacion destino) {
         super(transeunte, cuidadores, inicio, destino);
     }
+
+    @Override
+    public void cambiarEstado(Transeunte transeunte) {
+        //En principio, no puede cambiarse este estado
+    }
+
 }

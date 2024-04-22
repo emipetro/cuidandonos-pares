@@ -18,8 +18,8 @@ public class Transeunte {
     @Setter @Getter private Sexo sexo;
     @Setter @Getter private Trayecto trayectoAsociado = null;
     @Setter @Getter private String numeroDeTelefono;
-
     @Setter @Getter private Alerta alertaConfigurada;
+    @Getter private List<Trayecto> trayectosRealizados = null;
 
     public Transeunte(String nombreCompleto, String direccion, Integer edad, Sexo sexo, String numeroDeTelefono, Alerta alertaConfigurada) {
         this.nombreCompleto = nombreCompleto;
@@ -31,30 +31,38 @@ public class Transeunte {
     }
 
     ////////// BOTONES /////////
-
     public void apretarBotonComenzarViaje() {
         float demoraAproximada = this.trayectoAsociado.calcularDemora();
         List<Cuidador> cuidadoresConfirmados = this.trayectoAsociado.getCuidadores();
+
         for(Cuidador unCuidador : cuidadoresConfirmados){
             unCuidador.recibirNotificacion("La demora aproximada es de "+demoraAproximada+" minutos");
         }
+
+        //Cambio el estado de Solicitado a Comenzado
+        this.trayectoAsociado.cambiarEstado(this);
+        this.comenzarViaje();
     }
 
     public void apretarBotonLlegueBien(){
-        List<Cuidador> cuidadores = trayectoAsociado.getCuidadores();
-        Ubicacion inicio = trayectoAsociado.getInicio();
-        Ubicacion destino = trayectoAsociado.getDestino();
-
-        //Seteo como nuevo trayecto asociado un trayecto FinalizadoCorrectamente pero con los campos del trayecto que en su momento fue Comenzado
-        setTrayectoAsociado(new FinalizadoCorrectamente(this,cuidadores,inicio,destino));
+        //Cambio el estado de Comenzado a FinalizadoCorrectamente
+        this.trayectoAsociado.cambiarEstado(this);
 
         //////////////////////////////////////////////
         // Habilitar notificaciones para el transeunte
         //////////////////////////////////////////////
 
-        for(Cuidador unCuidador : cuidadores){
+        for(Cuidador unCuidador : this.trayectoAsociado.getCuidadores()){
             unCuidador.recibirNotificacion("El viaje ha finalizado correctamente");
+            unCuidador.getTrayectosRealizados().add(trayectoAsociado);
         }
+
+        //Ahora que el viaje terminó correctamente, libero a los cuidadores y el transeunte del trayecto y lo guardo en un historial
+        this.trayectosRealizados.add(trayectoAsociado);
+        for(Cuidador unCuidador : this.trayectoAsociado.getCuidadores()){
+            unCuidador.setTrayectoAsociado(null);
+        }
+        this.setTrayectoAsociado(null);
     }
 
     ////////////////////////////
@@ -67,17 +75,24 @@ public class Transeunte {
 
         List<Cuidador> cuidadoresConfirmados = null;
         for(Cuidador unCuidador : cuidadoresDeseados){
-            if(unCuidador.quiereHacerTrayecto()){
+            if(unCuidador.quiereHacerTrayecto(this.trayectoAsociado)){
+                unCuidador.setTrayectoAsociado(this.trayectoAsociado);
                 cuidadoresConfirmados.add(unCuidador);
             }
         }
 
         if(cuidadoresConfirmados!=null){
-            //MOSTRAR BOTÓN COMENZAR VIAJE
-        }
+            //Asigno los cuidadores al trayecto
+            this.trayectoAsociado.setCuidadores(cuidadoresConfirmados);
 
-        this.setTrayectoAsociado(new Comenzado(this,cuidadoresConfirmados,inicio,destino));
-        this.comenzarViaje();
+            //MOSTRAR BOTÓN COMENZAR VIAJE
+
+            //Si apreta se ejecuta:
+            this.apretarBotonComenzarViaje();
+        }
+        else{
+            // Error por falta de cuidadores
+        }
     }
 
     //Cuando el transeunte apriete el botón, comienza el viaje
