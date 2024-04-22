@@ -1,10 +1,7 @@
 package usuarios;
 import alertas.Alerta;
 import extras.modos_de_viaje.ModoDeViaje;
-import trayecto.Comenzado;
-import trayecto.FinalizadoCorrectamente;
-import trayecto.Solicitado;
-import trayecto.Trayecto;
+import trayecto.*;
 import extras.Sexo;
 import extras.Ubicacion;
 import lombok.Getter;
