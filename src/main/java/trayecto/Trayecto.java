@@ -3,6 +3,7 @@ package trayecto;
 import extras.calculadora.CalculadoraDistancia;
 import extras.calculadora.DistanciaMatrixAPI;
 import extras.Ubicacion;
+import extras.modos_de_viaje.ModoDeViaje;
 import lombok.Getter;
 import lombok.Setter;
 import usuarios.Cuidador;
@@ -11,25 +12,18 @@ import java.util.List;
 
 public abstract class Trayecto {
     @Setter @Getter protected Transeunte transeunte;
-    @Setter @Getter protected List<Cuidador> cuidadores;
+    @Setter @Getter protected List<Cuidador> cuidadores = null;
+    @Setter @Getter protected ModoDeViaje modoDeViaje;
+    @Getter @Setter private List<Tramo> tramos;
 
-    @Setter @Getter protected Ubicacion inicio;
-    @Setter @Getter protected Ubicacion destino;
-
-    @Getter @Setter protected CalculadoraDistancia calculadoraDistancia = new DistanciaMatrixAPI();
-
-    public Trayecto(Transeunte transeunte, List<Cuidador> cuidadores, Ubicacion inicio, Ubicacion destino) {
+    public Trayecto(Transeunte transeunte, ModoDeViaje modoDeViaje, List<Tramo> tramos) {
         this.transeunte = transeunte;
-        this.cuidadores = cuidadores;
-        this.inicio = inicio;
-        this.destino = destino;
+        this.modoDeViaje = modoDeViaje;
+        this.tramos = tramos;
     }
+
     public float calcularDemora(){
-        float distanciaTrayecto = this.calculadoraDistancia.calcularDistancia(inicio,destino);
-
-        //Calcular tiempo de demora aproximado entre inicio y destino usando distanciaTrayecto
-
-        return (float) 0;
+        return this.modoDeViaje.demoraSegunModo(this);
     }
     public abstract void cambiarEstado(Transeunte transeunte);
 }

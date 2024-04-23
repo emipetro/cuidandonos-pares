@@ -1,16 +1,14 @@
 package extras.modos_de_viaje;
 
+import trayecto.Tramo;
 import trayecto.Trayecto;
-import trayecto.TrayectoExtendido;
-
-import java.util.List;
 
 public class IrAvisando implements ModoDeViaje{
     @Override
-    public float demoraSegunModo(TrayectoExtendido trayectoExtendido) {
+    public float demoraSegunModo(Trayecto trayecto) {
         float demoraTotalTrayectos = 0;
-        for(Trayecto unTrayecto : trayectoExtendido.getTrayectos()){
-            demoraTotalTrayectos+= unTrayecto.calcularDemora();
+        for(Tramo unTramo : trayecto.getTramos()){
+            demoraTotalTrayectos+= unTramo.calcularDemora();
         }
 
         return demoraTotalTrayectos;

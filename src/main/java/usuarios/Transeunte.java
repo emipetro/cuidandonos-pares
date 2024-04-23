@@ -1,12 +1,14 @@
 package usuarios;
 import alertas.Alerta;
 import extras.modos_de_viaje.ModoDeViaje;
+import extras.modos_de_viaje.ViajeNormal;
 import trayecto.*;
 import extras.Sexo;
 import extras.Ubicacion;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Transeunte {
@@ -64,8 +66,11 @@ public class Transeunte {
     }
 
     ////////////////////////////
-    public void quieroViajar(Ubicacion inicio, Ubicacion destino, List<Cuidador> cuidadoresDeseados){
-        this.setTrayectoAsociado(new Solicitado(this,inicio,destino));
+    public void quieroViajarSimple(Ubicacion inicio, Ubicacion destino, List<Cuidador> cuidadoresDeseados){
+        Tramo tramo = new Tramo(inicio,destino);
+        List<Tramo> unicoTramo = new ArrayList<>();
+        ViajeNormal viajeNormal = new ViajeNormal();
+        this.setTrayectoAsociado(new Solicitado(this, viajeNormal,unicoTramo));
 
         for(Cuidador unCuidador : cuidadoresDeseados){
             unCuidador.recibirNotificacion("Te han seleccionado para un trayecto");
@@ -114,8 +119,10 @@ public class Transeunte {
     }
 
     /////////////IMPLEMENTACIÓN EXTENDIDA/////////////
-    public void quieroViajarExtendido(Ubicacion inicio, List<Ubicacion> destinos, List<Cuidador> cuidadoresDeseados, ModoDeViaje modoDeViaje){
-
-
+    // Trabajar para unificar ambas funciones en una sóla -> Puede ser un for para armar a mano los tramos del trayecto usando la lista destinos
+    public void nuevoQuieroViajar(Ubicacion inicio, List<Ubicacion> destinos, List<Cuidador> cuidadoresDeseados){
+        if(destinos.size()==1){
+            this.quieroViajarSimple(inicio,destinos.get(0),cuidadoresDeseados);
+        }
     }
 }
