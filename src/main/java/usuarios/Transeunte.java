@@ -1,5 +1,7 @@
 package usuarios;
 import alertas.Alerta;
+import extras.modos_de_viaje.DetenerseNMinutos;
+import extras.modos_de_viaje.IrAvisando;
 import extras.modos_de_viaje.ModoDeViaje;
 import extras.modos_de_viaje.ViajeNormal;
 import trayecto.*;
@@ -32,7 +34,7 @@ public class Transeunte {
 
     ////////// BOTONES /////////
     public void apretarBotonComenzarViaje() {
-        float demoraAproximada = this.trayectoAsociado.calcularDemora();
+        double demoraAproximada = this.trayectoAsociado.calcularDemora();
         List<Cuidador> cuidadoresConfirmados = this.trayectoAsociado.getCuidadores();
 
         for(Cuidador unCuidador : cuidadoresConfirmados){
@@ -44,14 +46,21 @@ public class Transeunte {
         this.comenzarViaje();
     }
 
+    public void apretarBotonCompleteTramo(int numeroDeTramo){
+        List<Tramo> tramos = this.trayectoAsociado.getTramos();
+        Tramo tramoCompletado = tramos.get(numeroDeTramo);
+
+        //Confirmo que el tramo fue completado
+        tramoCompletado.setTramoCompleto(true);
+    }
+
     public void apretarBotonLlegueBien(){
         //Cambio el estado de Comenzado a FinalizadoCorrectamente
         this.trayectoAsociado.cambiarEstado(this);
 
-        //////////////////////////////////////////////
         // Habilitar notificaciones para el transeunte
-        //////////////////////////////////////////////
 
+        //Notificar a los cuidadores
         for(Cuidador unCuidador : this.trayectoAsociado.getCuidadores()){
             unCuidador.recibirNotificacion("El viaje ha finalizado correctamente");
             unCuidador.getTrayectosRealizados().add(trayectoAsociado);
@@ -60,22 +69,52 @@ public class Transeunte {
         //Ahora que el viaje terminó correctamente, libero a los cuidadores y el transeunte del trayecto y lo guardo en un historial
         this.trayectosRealizados.add(trayectoAsociado);
         for(Cuidador unCuidador : this.trayectoAsociado.getCuidadores()){
+            unCuidador.getTrayectosRealizados().add(this.trayectoAsociado);
             unCuidador.setTrayectoAsociado(null);
         }
         this.setTrayectoAsociado(null);
     }
 
+    public ModoDeViaje apretarBotonElegirModoDeViaje(){
+        // El usuario verá la opción de elegir el modo de viaje si el trayecto tiene más de una parada
+        //ModoDeViaje modoDeViaje = new IrAvisando();
+        ModoDeViaje modoDeViaje = new DetenerseNMinutos(10);
+        return modoDeViaje;
+    }
     ////////////////////////////
-    public void quieroViajarSimple(Ubicacion inicio, Ubicacion destino, List<Cuidador> cuidadoresDeseados){
-        Tramo tramo = new Tramo(inicio,destino);
-        List<Tramo> unicoTramo = new ArrayList<>();
-        ViajeNormal viajeNormal = new ViajeNormal();
-        this.setTrayectoAsociado(new Solicitado(this, viajeNormal,unicoTramo));
 
+    public void ejecutarAlerta() {
+        this.alertaConfigurada.alertar(this);
+    }
+
+    /////////////IMPLEMENTACIÓN EXTENDIDA/////////////
+
+    public void quieroViajar(Ubicacion inicio, List<Ubicacion> destinos, List<Cuidador> cuidadoresDeseados){
+        //Armar los tramos
+        Tramo tramoBase = new Tramo(inicio, destinos.get(0));
+        List<Tramo> tramos = new ArrayList<>();
+        tramos.add(tramoBase);
+
+        for(int i=1; i<=destinos.size() ;i++){
+            Tramo tramo = new Tramo(destinos.get(i-1), destinos.get(i));
+            tramos.add(tramo);
+        }
+
+        //Seteo el trayecto asociado
+        if(tramos.size()==1){
+            this.setTrayectoAsociado(new Solicitado(this,(new ViajeNormal()),tramos));
+        }
+        else {
+            //Mostrar botón elegir modo de viaje
+            this.setTrayectoAsociado(new Solicitado(this,this.apretarBotonElegirModoDeViaje(),tramos));
+        }
+
+        //Notifico a los cuidadores
         for(Cuidador unCuidador : cuidadoresDeseados){
             unCuidador.recibirNotificacion("Te han seleccionado para un trayecto");
         }
 
+        //Confirmo los cuidadores
         List<Cuidador> cuidadoresConfirmados = null;
         for(Cuidador unCuidador : cuidadoresDeseados){
             if(unCuidador.quiereHacerTrayecto(this.trayectoAsociado)){
@@ -84,13 +123,14 @@ public class Transeunte {
             }
         }
 
+        //Si hay al menos un cuidador confirmado:
         if(cuidadoresConfirmados!=null){
             //Asigno los cuidadores al trayecto
             this.trayectoAsociado.setCuidadores(cuidadoresConfirmados);
 
             //MOSTRAR BOTÓN COMENZAR VIAJE
 
-            //Si apreta se ejecuta:
+            //Si aprieta se ejecuta:
             this.apretarBotonComenzarViaje();
         }
         else{
@@ -100,29 +140,13 @@ public class Transeunte {
 
     //Cuando el transeunte apriete el botón, comienza el viaje
     public void comenzarViaje(){
-        float demoraAproximada = this.trayectoAsociado.calcularDemora();
-
-        //Mientras no haya pasado el tiempo de la demora se bloquean las notificaciones
-        for(int i=0;i<demoraAproximada;i++){
-            //Bloquear notificaciones
-            //Mientras se ejecuta esto, el usuario puede presionar el botón de "Llegué bien!"
-        }
+        //Se ejecuta dentro de esta función un for para esperar la demora que corresponda
+        //A su vez, se bloquean las notificaciones. Mientras pasa el tiempo estimado de demora, el usuario puede presionar el botón llegué bien
+        this.trayectoAsociado.getModoDeViaje().esperarTiempoDeDemora(this.trayectoAsociado);
 
         //Si el trayecto no pasó a ser FinalizadoCorrectamente (debido al botón), se ejecuta la alarma
         if(!(this.trayectoAsociado instanceof FinalizadoCorrectamente)){
             this.ejecutarAlerta();
-        }
-    }
-
-    public void ejecutarAlerta() {
-        this.alertaConfigurada.alertar(this);
-    }
-
-    /////////////IMPLEMENTACIÓN EXTENDIDA/////////////
-    // Trabajar para unificar ambas funciones en una sóla -> Puede ser un for para armar a mano los tramos del trayecto usando la lista destinos
-    public void nuevoQuieroViajar(Ubicacion inicio, List<Ubicacion> destinos, List<Cuidador> cuidadoresDeseados){
-        if(destinos.size()==1){
-            this.quieroViajarSimple(inicio,destinos.get(0),cuidadoresDeseados);
         }
     }
 }

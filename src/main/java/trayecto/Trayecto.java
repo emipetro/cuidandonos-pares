@@ -22,7 +22,7 @@ public abstract class Trayecto {
         this.tramos = tramos;
     }
 
-    public float calcularDemora(){
+    public double calcularDemora(){
         return this.modoDeViaje.demoraSegunModo(this);
     }
     public abstract void cambiarEstado(Transeunte transeunte);

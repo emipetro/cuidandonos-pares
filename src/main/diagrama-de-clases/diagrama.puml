@@ -11,10 +11,14 @@
         -trayectosRealizados : List<Trayecto>
 
         +apretarBotonComenzarViaje() : void
-        +apretarBotonLlegarBien() : void
-        +quieroViajar(Ubicacion, Ubicacion, List<Cuidador>) : void
-        +comenzarViaje() : void
+        +apretarBotonCompleteTramo(Integer) : void
+        +apretarBotonLlegueBien() : void
+        +apretarBotonElegirModoViaje() : ModoDeViaje
+
         +ejecutarAlerta() : void
+
+        +quieroViajar(Ubicacion, List<Ubicacion>, List<Cuidador>) : void
+        +comenzarViaje() : void
     }
 
     enum Sexo{
@@ -34,8 +38,8 @@
         -edad : Integer
         -sexo : Sexo
         -numeroDeTelefono : String
-        -trayectoAsociado : Trayecto
         -trayectosRealizados : List<Trayecto>
+        -trayectoAsociado : Trayecto
 
         +recibirNotificacion(String) : void
         +quiereHacerTrayecto(Trayecto) : boolean
@@ -44,12 +48,20 @@
     abstract class Trayecto{
         -transeunte : Transeunte
         -cuidadores : List<Cuidador>
+        -modoDeViaje : ModoDeViaje
+        -tramos : List<Tramo>
+
+        +calcularDemora() : double
+        +cambiarEstado(Transeunte) : void
+    }
+
+    class Tramo{
         -inicio : Ubicacion
         -destino : Ubicacion
         -calculadoraDistancia : CalculadoraDistancia
+        -tramoCompleto : boolean
 
-        +calcularDemora() : float
-        +cambiarEstado(Transeunte) : void
+        +calcularDemoraTramo() : double
     }
 
     class Comenzado{
@@ -60,6 +72,26 @@
     }
     class Solicitado{
         +cambiarEstado(Transeunte) : void
+    }
+
+    interface ModoDeViaje{
+        +demoraSegunModo(Trayecto) : double
+        +esperarTiempoDeDemora(Trayecto) : void
+    }
+
+    class ViajeNormal{
+        +demoraSegunModo(Trayecto) : double
+        +esperarTiempoDeDemora(Trayecto) : void
+    }
+
+    class IrAvisando{
+        +demoraSegunModo(Trayecto) : double
+        +esperarTiempoDeDemora(Trayecto) : void
+    }
+
+    class DetenerseNMinutos{
+        +demoraSegunModo(Trayecto) : double
+        +esperarTiempoDeDemora(Trayecto) : void
     }
 
     interface CalculadoraDistancia{
@@ -79,10 +111,13 @@
     }
 
     class AlertaAPolicia{
+        -numeroPolicia : String
         +alertar(Transeunte) : void
     }
 
     class Esperar{
+        -minutosDeEspera : Integer
+        -alertaSecundaria : Alerta
         +alertar(Transeunte) : void
     }
 
@@ -95,6 +130,10 @@ Trayecto --* Transeunte
 Trayecto -->"*" Cuidador
 Transeunte --> Ubicacion
 Trayecto -->"*" Ubicacion
+Trayecto..>ModoDeViaje
+ViajeNormal..|>ModoDeViaje
+IrAvisando..|>ModoDeViaje
+DetenerseNMinutos..|>ModoDeViaje
 Transeunte ..> Alerta
 AlertaACuidadores ..|> Alerta
 AlertaAPolicia ..|> Alerta
@@ -105,5 +144,8 @@ FinalizadoCorrectamente --|> Trayecto
 Solicitado --|> Trayecto
 DistanciaMatrixAPI ..|> CalculadoraDistancia
 Trayecto ..> CalculadoraDistancia
+Trayecto-->"*"Tramo
+
+
 
 @enduml
