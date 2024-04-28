@@ -21,7 +21,7 @@ public class DetenerseNMinutos implements ModoDeViaje{
         int demoraPorDetenciones = (trayecto.getTramos().size()-1)*minutosDetenido;
 
         //Demora sólo de los trayectos, sin contar detenciones
-        float demoraTotalTrayecto = 0;
+        double demoraTotalTrayecto = 0;
         for(Tramo unTramo : trayecto.getTramos()){
             demoraTotalTrayecto+= unTramo.calcularDemoraTramo();
         }

@@ -10,8 +10,10 @@ import extras.Ubicacion;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Transeunte {
     @Setter @Getter private String nombreCompleto;
@@ -42,7 +44,7 @@ public class Transeunte {
         }
 
         //Cambio el estado de Solicitado a Comenzado
-        this.trayectoAsociado.cambiarEstado(this);
+        this.trayectoAsociado.getHistorialEstados().add(new Estado(new PosibleEstado("Comenzado"), LocalDateTime.now()));
         this.comenzarViaje();
     }
 
@@ -56,7 +58,7 @@ public class Transeunte {
 
     public void apretarBotonLlegueBien(){
         //Cambio el estado de Comenzado a FinalizadoCorrectamente
-        this.trayectoAsociado.cambiarEstado(this);
+        this.trayectoAsociado.getHistorialEstados().add(new Estado(new PosibleEstado("Finalizado"), LocalDateTime.now()));
 
         // Habilitar notificaciones para el transeunte
 
@@ -77,8 +79,12 @@ public class Transeunte {
 
     public ModoDeViaje apretarBotonElegirModoDeViaje(){
         // El usuario verá la opción de elegir el modo de viaje si el trayecto tiene más de una parada
+
+        //Ejemplo de selección:
+
         //ModoDeViaje modoDeViaje = new IrAvisando();
         ModoDeViaje modoDeViaje = new DetenerseNMinutos(10);
+
         return modoDeViaje;
     }
     ////////////////////////////
@@ -102,11 +108,11 @@ public class Transeunte {
 
         //Seteo el trayecto asociado
         if(tramos.size()==1){
-            this.setTrayectoAsociado(new Solicitado(this,(new ViajeNormal()),tramos));
+            this.setTrayectoAsociado(new Trayecto(this,(new ViajeNormal()),tramos));
         }
         else {
             //Mostrar botón elegir modo de viaje
-            this.setTrayectoAsociado(new Solicitado(this,this.apretarBotonElegirModoDeViaje(),tramos));
+            this.setTrayectoAsociado(new Trayecto(this,this.apretarBotonElegirModoDeViaje(),tramos));
         }
 
         //Notifico a los cuidadores
@@ -145,7 +151,7 @@ public class Transeunte {
         this.trayectoAsociado.getModoDeViaje().esperarTiempoDeDemora(this.trayectoAsociado);
 
         //Si el trayecto no pasó a ser FinalizadoCorrectamente (debido al botón), se ejecuta la alarma
-        if(!(this.trayectoAsociado instanceof FinalizadoCorrectamente)){
+        if(!Objects.equals(this.trayectoAsociado.estadoActual().getEstado().getNombre(), "Finalizado")){
             this.ejecutarAlerta();
         }
     }

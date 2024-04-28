@@ -8,7 +8,7 @@ import java.util.List;
 public class IrAvisando implements ModoDeViaje{
     @Override
     public double demoraSegunModo(Trayecto trayecto) {
-        float demoraTotalTrayecto = 0;
+        double demoraTotalTrayecto = 0;
         for(Tramo unTramo : trayecto.getTramos()){
             demoraTotalTrayecto+= unTramo.calcularDemoraTramo();
         }

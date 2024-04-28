@@ -45,14 +45,15 @@
         +quiereHacerTrayecto(Trayecto) : boolean
     }
 
-    abstract class Trayecto{
+    class Trayecto{
         -transeunte : Transeunte
         -cuidadores : List<Cuidador>
         -modoDeViaje : ModoDeViaje
         -tramos : List<Tramo>
+        -historialEstados : List<Estado>
 
         +calcularDemora() : double
-        +cambiarEstado(Transeunte) : void
+        +estadoActual() : Estado 
     }
 
     class Tramo{
@@ -64,14 +65,13 @@
         +calcularDemoraTramo() : double
     }
 
-    class Comenzado{
-        +cambiarEstado(Transeunte) : void
+    class Estado{
+        -estado : PosibleEstado
+        -tiempo : LocalDateTime
     }
-    class FinalizadoCorrectamente{
-        +cambiarEstado(Transeunte) : void
-    }
-    class Solicitado{
-        +cambiarEstado(Transeunte) : void
+
+    class PosibleEstado{
+        -nombre : String
     }
 
     interface ModoDeViaje{
@@ -90,6 +90,8 @@
     }
 
     class DetenerseNMinutos{
+        -minutosDetenido : Integer
+
         +demoraSegunModo(Trayecto) : double
         +esperarTiempoDeDemora(Trayecto) : void
     }
@@ -131,6 +133,8 @@ Trayecto -->"*" Cuidador
 Transeunte --> Ubicacion
 Trayecto -->"*" Ubicacion
 Trayecto..>ModoDeViaje
+Trayecto-->"*"Estado
+Estado-->PosibleEstado
 ViajeNormal..|>ModoDeViaje
 IrAvisando..|>ModoDeViaje
 DetenerseNMinutos..|>ModoDeViaje
@@ -139,13 +143,9 @@ AlertaACuidadores ..|> Alerta
 AlertaAPolicia ..|> Alerta
 Esperar ..|> Alerta
 LlamarACelular ..|> Alerta
-Comenzado --|> Trayecto
-FinalizadoCorrectamente --|> Trayecto
-Solicitado --|> Trayecto
 DistanciaMatrixAPI ..|> CalculadoraDistancia
 Trayecto ..> CalculadoraDistancia
 Trayecto-->"*"Tramo
-
 
 
 @enduml
